@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import api from "../../utils/api";
+import "./QuizAttempt.css";
+import "../../App.css";
 
 const QuizAttempt = () => {
   const { id } = useParams();
@@ -9,19 +11,11 @@ const QuizAttempt = () => {
   const [submitted, setSubmitted] = useState(false);
   const [result, setResult] = useState(null);
 
-  // useEffect(() => {
-  //   api.get(`/quizzes/${id}/questions`).then((res) => setQuestions(res.data));
-  // }, [id]);
   useEffect(() => {
-    console.log("📤 Sending request to get questions for quiz:", id);
     api
       .get(`/quizzes/${id}/questions`)
-      .then((res) => {
-        setQuestions(res.data);
-      })
-      .catch((err) => {
-        console.error("❌ Error fetching questions:", err);
-      });
+      .then((res) => setQuestions(res.data))
+      .catch((err) => console.error("Error fetching questions:", err));
   }, [id]);
 
   const handleSelect = (qid, optionText) => {
@@ -44,23 +38,23 @@ const QuizAttempt = () => {
 
   if (submitted)
     return (
-      <div>
-        <h2>Quiz Submitted!</h2>
-        <p>
-          Your Score: {result.score} / {result.total}
+      <div className="quiz-result">
+        <h2 className="result-title">Quiz Submitted!</h2>
+        <p className="result-score">
+          Your Score: <strong>{result.score}</strong> / {result.total}
         </p>
       </div>
     );
 
   return (
-    <div>
-      <h2>Quiz</h2>
+    <div className="quiz-attempt">
+      <h2 className="quiz-title">Quiz</h2>
       {questions.map((q) => (
-        <div key={q._id}>
-          <h4>{q.questionText}</h4>
-          {q.options.map((opt, idx) => (
-            <div key={idx}>
-              <label>
+        <div className="quiz-question" key={q._id}>
+          <h4 className="question-text">{q.questionText}</h4>
+          <div className="options-group">
+            {q.options.map((opt, idx) => (
+              <label className="option-item" key={idx}>
                 <input
                   type="radio"
                   name={q._id}
@@ -70,11 +64,13 @@ const QuizAttempt = () => {
                 />
                 {opt.optionText}
               </label>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       ))}
-      <button onClick={handleSubmit}>Submit Quiz</button>
+      <button className="btn submit-btn" onClick={handleSubmit}>
+        Submit Quiz
+      </button>
     </div>
   );
 };

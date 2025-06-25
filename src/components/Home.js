@@ -1,13 +1,14 @@
 import { Link } from "react-router-dom";
+import "./Home.css";
 
 const Home = () => {
   return (
-    <div style={{ padding: "2rem", textAlign: "center" }}>
-      <h1>Quiz App</h1>
-      <p>Welcome to the ultimate quiz platform!</p>
-      <div>
-        <Link to="/login"><button>Login</button></Link>
-        <Link to="/register"><button>Register</button></Link>
+    <div className="home-container">
+      <h1 className="home-title">Quiz App</h1>
+      <p className="home-subtitle">Welcome to the ultimate quiz platform!</p>
+      <div className="home-buttons">
+        <Link to="/login"><button className="btn">Login</button></Link>
+        <Link to="/register"><button className="btn">Register</button></Link>
       </div>
     </div>
   );

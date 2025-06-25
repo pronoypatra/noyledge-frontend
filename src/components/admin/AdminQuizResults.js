@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import api from '../../utils/api';
+import './AdminQuizResults.css';
+import "../../App.css";
 
 const AdminQuizResults = () => {
   const { id: quizId } = useParams();
@@ -22,31 +24,33 @@ const AdminQuizResults = () => {
   }, [quizId]);
 
   return (
-    <div className="p-6 max-w-3xl mx-auto">
-      <h2 className="text-2xl font-bold mb-4">Results for Quiz: {quizTitle}</h2>
+    <div className="admin-results">
+      <h2 className="results-title">Results for Quiz: {quizTitle}</h2>
       {results.length === 0 ? (
-        <p>No results found for this quiz.</p>
+        <p className="info-message">No results found for this quiz.</p>
       ) : (
-        <table className="w-full border">
-          <thead>
-            <tr className="bg-gray-200">
-              <th className="p-2 border">User</th>
-              <th className="p-2 border">Score</th>
-              <th className="p-2 border">Total</th>
-              <th className="p-2 border">Attempted On</th>
-            </tr>
-          </thead>
-          <tbody>
-            {results.map((res, index) => (
-              <tr key={index}>
-                <td className="p-2 border">{res.username}</td>
-                <td className="p-2 border">{res.score}</td>
-                <td className="p-2 border">{res.total}</td>
-                <td className="p-2 border">{new Date(res.attemptedAt).toLocaleString()}</td>
+        <div className="table-wrapper">
+          <table className="results-table">
+            <thead>
+              <tr>
+                <th>User</th>
+                <th>Score</th>
+                <th>Total</th>
+                <th>Attempted On</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {results.map((res, index) => (
+                <tr key={index}>
+                  <td>{res.username}</td>
+                  <td>{res.score}</td>
+                  <td>{res.total}</td>
+                  <td>{new Date(res.attemptedAt).toLocaleString()}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
     </div>
   );

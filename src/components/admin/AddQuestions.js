@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
-import api from '../../utils/api'; // Using your configured API utility
+import api from '../../utils/api';
+import './AddQuestions.css';
+import "../../App.css";
 
 const AddQuestions = () => {
   const { id: quizId } = useParams();
@@ -25,21 +27,10 @@ const AddQuestions = () => {
     }
 
     try {
-      const payload = {
-        questionText,
-        options,
-        correctOption,
-      };
-
-      const res = await api.post(
-        `/quizzes/${quizId}/questions`,
-        payload,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const payload = { questionText, options, correctOption };
+      const res = await api.post(`/quizzes/${quizId}/questions`, payload, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
       if (res.status === 201 || res.status === 200) {
         setMessage('✅ Question added!');
@@ -60,19 +51,19 @@ const AddQuestions = () => {
   };
 
   return (
-    <div className="p-6 max-w-2xl mx-auto">
-      <h2 className="text-xl font-bold mb-4">Add Question to Quiz</h2>
-      {message && <div className="mb-4 text-blue-600">{message}</div>}
-      <form onSubmit={handleSubmit} className="space-y-4">
+    <div className="add-question">
+      <h2 className="title">Add Question to Quiz</h2>
+      {message && <div className="status-message">{message}</div>}
+      <form onSubmit={handleSubmit} className="question-form">
         <textarea
           placeholder="Enter your question"
           value={questionText}
           onChange={(e) => setQuestionText(e.target.value)}
-          className="w-full border p-2"
+          className="question-text"
           required
         />
         {options.map((option, index) => (
-          <div key={index} className="flex items-center gap-2">
+          <div key={index} className="option-row">
             <input
               type="radio"
               name="correctOption"
@@ -84,14 +75,12 @@ const AddQuestions = () => {
               placeholder={`Option ${index + 1}`}
               value={option}
               onChange={(e) => handleOptionChange(e.target.value, index)}
-              className="flex-grow border p-2"
+              className="option-input"
               required
             />
           </div>
         ))}
-        <button type="submit" className="bg-green-600 text-white px-4 py-2 rounded">
-          Add Question
-        </button>
+        <button type="submit" className="submit-btn">Add Question</button>
       </form>
     </div>
   );

@@ -2,6 +2,8 @@ import React, { useState, useContext } from "react";
 import api from "../../utils/api";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
+import "./Login.css";
+import "../../App.css";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -13,7 +15,6 @@ const Login = () => {
     e.preventDefault();
     try {
       const res = await api.post("/auth/login", { email, password });
-      // console.log(res.data);
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("userId", res.data._id);
       setAuth({ user: res.data, token: res.data.token });
@@ -24,16 +25,27 @@ const Login = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <h2>Login</h2>
-      <input placeholder="Email" onChange={(e) => setEmail(e.target.value)} />
-      <input
-        placeholder="Password"
-        type="password"
-        onChange={(e) => setPassword(e.target.value)}
-      />
-      <button type="submit">Login</button>
-    </form>
+    <div className="login-container">
+      <form className="login-form" onSubmit={handleSubmit}>
+        <h2 className="login-title">Login</h2>
+
+        <input
+          className="form-input"
+          placeholder="Email"
+          type="email"
+          onChange={(e) => setEmail(e.target.value)}
+        />
+
+        <input
+          className="form-input"
+          placeholder="Password"
+          type="password"
+          onChange={(e) => setPassword(e.target.value)}
+        />
+
+        <button className="btn" type="submit">Login</button>
+      </form>
+    </div>
   );
 };
 
