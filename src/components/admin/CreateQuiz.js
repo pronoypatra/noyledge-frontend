@@ -42,21 +42,21 @@ const CreateQuiz = () => {
         setTitle(''); // Clear the input fields after successful creation
         setDescription('');
       } else {
-        console.error('Unexpected response status:', res.status);
+        // console.error('Unexpected response status:', res.status);
         setMessage('❌ Failed to create quiz.');
       }
     } catch (error) {
       console.error('❌ Error occurred during quiz creation:');
       if (error.response) {
-        console.error('Status:', error.response.status);
-        console.error('Data:', error.response.data);
+        // console.error('Status:', error.response.status);
+        // console.error('Data:', error.response.data);
         setMessage(`❌ Error ${error.response.status}: ${error.response.data.message || 'Something went wrong'}`);
       } else if (error.request) {
-        console.error('No response received from server.');
-        console.error(error.request);
+        // console.error('No response received from server.');
+        // console.error(error.request);
         setMessage('❌ No response from server.');
       } else {
-        console.error('Error setting up the request:', error.message);
+        // console.error('Error setting up the request:', error.message);
         setMessage('❌ Error setting up the request.');
       }
     }

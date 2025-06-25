@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import axios from 'axios';
+import api from '../../utils/api';
 
 const AdminQuizResults = () => {
   const { id: quizId } = useParams();
@@ -10,7 +10,7 @@ const AdminQuizResults = () => {
   useEffect(() => {
     const fetchResults = async () => {
       try {
-        const res = await axios.get(`/api/quizzes/${quizId}/results`);
+        const res = await api.get(`/quizzes/${quizId}/results`);
         setResults(res.data.results);
         setQuizTitle(res.data.title);
       } catch (err) {

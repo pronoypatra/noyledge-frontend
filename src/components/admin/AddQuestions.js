@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
-import axios from 'axios';
+import api from '../../utils/api'; // Using your configured API utility
 
 const AddQuestions = () => {
   const { id: quizId } = useParams();
@@ -17,20 +17,45 @@ const AddQuestions = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const token = localStorage.getItem('token');
+    if (!token) {
+      setMessage('❌ You must be logged in to add a question.');
+      return;
+    }
+
     try {
       const payload = {
         questionText,
         options,
         correctOption,
       };
-      await axios.post(`/api/quizzes/${quizId}/questions`, payload);
-      setMessage('✅ Question added!');
-      setQuestionText('');
-      setOptions(['', '', '', '']);
-      setCorrectOption(0);
+
+      const res = await api.post(
+        `/quizzes/${quizId}/questions`,
+        payload,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (res.status === 201 || res.status === 200) {
+        setMessage('✅ Question added!');
+        setQuestionText('');
+        setOptions(['', '', '', '']);
+        setCorrectOption(0);
+      } else {
+        setMessage('❌ Failed to add question.');
+      }
     } catch (err) {
-      console.error(err);
-      setMessage('❌ Error adding question');
+      console.error('❌ Error adding question:', err);
+      if (err.response) {
+        setMessage(`❌ Error ${err.response.status}: ${err.response.data.message || 'Something went wrong'}`);
+      } else {
+        setMessage('❌ Could not connect to server.');
+      }
     }
   };
 

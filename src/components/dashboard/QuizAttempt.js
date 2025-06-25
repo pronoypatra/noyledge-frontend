@@ -9,8 +9,19 @@ const QuizAttempt = () => {
   const [submitted, setSubmitted] = useState(false);
   const [result, setResult] = useState(null);
 
+  // useEffect(() => {
+  //   api.get(`/quizzes/${id}/questions`).then((res) => setQuestions(res.data));
+  // }, [id]);
   useEffect(() => {
-    api.get(`/quizzes/${id}/questions`).then((res) => setQuestions(res.data));
+    console.log("📤 Sending request to get questions for quiz:", id);
+    api
+      .get(`/quizzes/${id}/questions`)
+      .then((res) => {
+        setQuestions(res.data);
+      })
+      .catch((err) => {
+        console.error("❌ Error fetching questions:", err);
+      });
   }, [id]);
 
   const handleSelect = (qid, optionText) => {
