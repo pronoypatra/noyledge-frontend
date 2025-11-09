@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../../utils/api';
 import { API_BASE_URL } from '../../utils/api';
@@ -12,13 +12,7 @@ const FollowingModal = ({ userId, isOpen, onClose, onUpdate }) => {
   const [canUnfollow, setCanUnfollow] = useState(false);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (isOpen && userId) {
-      fetchFollowing();
-    }
-  }, [isOpen, userId]);
-
-  const fetchFollowing = async () => {
+  const fetchFollowing = useCallback(async () => {
     try {
       setLoading(true);
       const response = await api.get(`/profile/${userId}/following`);
@@ -29,7 +23,14 @@ const FollowingModal = ({ userId, isOpen, onClose, onUpdate }) => {
       console.error('Error fetching following:', error);
       setLoading(false);
     }
-  };
+  }, [userId]);
+
+  useEffect(() => {
+    if (isOpen && userId) {
+      fetchFollowing();
+    }
+  }, [isOpen, userId, fetchFollowing]);
+  
 
   const handleUnfollow = async (targetUserId) => {
     if (!window.confirm('Are you sure you want to unfollow this user?')) {

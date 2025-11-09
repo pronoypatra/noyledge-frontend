@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../../utils/api';
 import { API_BASE_URL } from '../../utils/api';
@@ -15,13 +15,7 @@ const FollowersModal = ({ userId, isOpen, onClose, onUpdate }) => {
   const [followingStatus, setFollowingStatus] = useState(new Map());
   const currentUserId = localStorage.getItem('userId');
 
-  useEffect(() => {
-    if (isOpen && userId) {
-      fetchFollowers();
-    }
-  }, [isOpen, userId]);
-
-  const fetchFollowers = async () => {
+  const fetchFollowers = useCallback(async () => {
     try {
       setLoading(true);
       const response = await api.get(`/profile/${userId}/followers`);
@@ -55,13 +49,13 @@ const FollowersModal = ({ userId, isOpen, onClose, onUpdate }) => {
       console.error('Error fetching followers:', error);
       setLoading(false);
     }
-  };
+  }, [userId, currentUserId]);
 
   useEffect(() => {
     if (isOpen && userId) {
       fetchFollowers();
     }
-  }, [isOpen, userId]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [isOpen, userId, fetchFollowers]);
 
   const handleFollowToggle = async (targetUserId, e) => {
     e.preventDefault();

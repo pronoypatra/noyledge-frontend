@@ -8,8 +8,6 @@ const api = axios.create({
   timeout: 10000, // 10 second timeout
 });
 
-console.log("API Base URL:", `${API_BASE_URL}/api`);
-
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
 

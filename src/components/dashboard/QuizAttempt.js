@@ -93,7 +93,6 @@ const QuizAttempt = () => {
       };
 
       try {
-        console.log('Submitting quiz with payload:', { ...payload, answers: answersArray.length });
         const res = await api.post(`/quizzes/${id}/submit`, payload);
         setResult(res.data);
         setSubmitted(true);

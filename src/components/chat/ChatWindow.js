@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../../utils/api';
 import { API_BASE_URL } from '../../utils/api';
@@ -14,6 +14,20 @@ const ChatWindow = ({ chat, onNewMessage, onRefreshChats }) => {
   const navigate = useNavigate();
   const currentUserId = localStorage.getItem('userId');
 
+  const fetchMessages = useCallback(async (silent = false) => {
+    try {
+      if (!silent) setLoading(true);
+      const response = await api.get(`/chat/${chat._id}/messages`);
+      // Messages are already in chronological order (oldest first) from backend
+      // No need to reverse - display oldest at top, newest at bottom
+      setMessages(response.data);
+      if (!silent) setLoading(false);
+    } catch (error) {
+      console.error('Error fetching messages:', error);
+      if (!silent) setLoading(false);
+    }
+  }, [chat._id]);
+
   useEffect(() => {
     fetchMessages();
     
@@ -27,25 +41,7 @@ const ChatWindow = ({ chat, onNewMessage, onRefreshChats }) => {
         clearInterval(pollIntervalRef.current);
       }
     };
-  }, [chat._id]);
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
-
-  const fetchMessages = async (silent = false) => {
-    try {
-      if (!silent) setLoading(true);
-      const response = await api.get(`/chat/${chat._id}/messages`);
-      // Messages are already in chronological order (oldest first) from backend
-      // No need to reverse - display oldest at top, newest at bottom
-      setMessages(response.data);
-      if (!silent) setLoading(false);
-    } catch (error) {
-      console.error('Error fetching messages:', error);
-      if (!silent) setLoading(false);
-    }
-  };
+  }, [fetchMessages]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../../utils/api';
 import { API_BASE_URL } from '../../utils/api';
@@ -9,11 +9,7 @@ const ChatList = ({ chats, selectedChatId, onChatSelect, onRefresh }) => {
   const [mutualFollows, setMutualFollows] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchMutualFollows();
-  }, []);
-
-  const fetchMutualFollows = async () => {
+  const fetchMutualFollows = useCallback(async () => {
     try {
       const userId = localStorage.getItem('userId');
       if (!userId) return;
@@ -36,7 +32,11 @@ const ChatList = ({ chats, selectedChatId, onChatSelect, onRefresh }) => {
       console.error('Error fetching mutual follows:', error);
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchMutualFollows();
+  }, [fetchMutualFollows]);
 
   const handleStartChat = async (userId) => {
     try {

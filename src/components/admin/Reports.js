@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import api from '../../utils/api';
 import Navbar from '../common/Navbar';
 import './Reports.css';
@@ -10,11 +10,7 @@ const Reports = () => {
   const [editingQuestion, setEditingQuestion] = useState(null);
   const [editForm, setEditForm] = useState({ questionText: '', options: [] });
 
-  useEffect(() => {
-    fetchReports();
-  }, [filter]);
-
-  const fetchReports = async () => {
+  const fetchReports = useCallback(async () => {
     try {
       const params = filter !== 'all' ? { status: filter } : {};
       const response = await api.get('/reports', { params });
@@ -24,7 +20,11 @@ const Reports = () => {
       console.error('Error fetching reports:', error);
       setLoading(false);
     }
-  };
+  }, [filter]);
+
+  useEffect(() => {
+    fetchReports();
+  }, [fetchReports]);
 
   const handleFix = async (reportId) => {
     try {

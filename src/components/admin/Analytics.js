@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
-import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import api from '../../utils/api';
 import './Analytics.css';
 
@@ -13,11 +13,7 @@ const Analytics = () => {
   const [completionTimeData, setCompletionTimeData] = useState({ histogram: [], stats: {} });
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchAnalytics();
-  }, [quizId]);
-
-  const fetchAnalytics = async () => {
+  const fetchAnalytics = useCallback(async () => {
     try {
       const [analyticsRes, participantsRes, attemptsRes, scoresRes, completionTimeRes] = await Promise.all([
         api.get(`/analytics/quiz/${quizId}`),
@@ -37,9 +33,11 @@ const Analytics = () => {
       console.error('Error fetching analytics:', error);
       setLoading(false);
     }
-  };
+  }, [quizId]);
 
-  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
+  useEffect(() => {
+    fetchAnalytics();
+  }, [fetchAnalytics]);
 
   // Format time in MM:SS or HH:MM:SS format
   const formatTime = (seconds) => {

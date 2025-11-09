@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import api from '../../utils/api';
@@ -19,17 +19,7 @@ const Explore = () => {
   const [savedQuizIds, setSavedQuizIds] = useState(new Set());
   const [followingUserIds, setFollowingUserIds] = useState(new Set());
 
-  useEffect(() => {
-    fetchCategories();
-    fetchSavedQuizzes();
-    fetchFollowingStatus();
-  }, []);
-
-  useEffect(() => {
-    fetchQuizzes();
-  }, [search, selectedTags, difficulty, sortBy]);
-
-  const fetchSavedQuizzes = async () => {
+  const fetchSavedQuizzes = useCallback(async () => {
     try {
       const response = await api.get('/quizzes/saved');
       const savedIds = new Set(response.data.map(quiz => quiz._id));
@@ -37,9 +27,9 @@ const Explore = () => {
     } catch (error) {
       console.error('Error fetching saved quizzes:', error);
     }
-  };
+  }, []);
 
-  const fetchFollowingStatus = async () => {
+  const fetchFollowingStatus = useCallback(async () => {
     try {
       const userId = localStorage.getItem('userId');
       if (userId) {
@@ -53,18 +43,18 @@ const Explore = () => {
     } catch (error) {
       console.error('Error fetching following status:', error);
     }
-  };
+  }, []);
 
-  const fetchCategories = async () => {
+  const fetchCategories = useCallback(async () => {
     try {
       const response = await api.get('/categories');
       setCategories(response.data);
     } catch (error) {
       console.error('Error fetching categories:', error);
     }
-  };
+  }, []);
 
-  const fetchQuizzes = async (pageNum = 1, append = false) => {
+  const fetchQuizzes = useCallback(async (pageNum = 1, append = false) => {
     try {
       setLoading(true);
       const params = {
@@ -80,7 +70,7 @@ const Explore = () => {
       const response = await api.get('/quizzes/explore', { params });
 
       if (append) {
-        setQuizzes([...quizzes, ...response.data.quizzes]);
+        setQuizzes(prevQuizzes => [...prevQuizzes, ...response.data.quizzes]);
       } else {
         setQuizzes(response.data.quizzes);
       }
@@ -91,7 +81,17 @@ const Explore = () => {
       console.error('Error fetching quizzes:', error);
       setLoading(false);
     }
-  };
+  }, [search, selectedTags, difficulty, sortBy]);
+
+  useEffect(() => {
+    fetchCategories();
+    fetchSavedQuizzes();
+    fetchFollowingStatus();
+  }, [fetchCategories, fetchSavedQuizzes, fetchFollowingStatus]);
+
+  useEffect(() => {
+    fetchQuizzes();
+  }, [fetchQuizzes]);
 
   const handleSearch = (e) => {
     setSearch(e.target.value);
@@ -107,11 +107,13 @@ const Explore = () => {
     setPage(1);
   };
 
-  const handleLoadMore = () => {
-    const nextPage = page + 1;
-    setPage(nextPage);
-    fetchQuizzes(nextPage, true);
-  };
+  const handleLoadMore = useCallback(() => {
+    setPage(prevPage => {
+      const nextPage = prevPage + 1;
+      fetchQuizzes(nextPage, true);
+      return nextPage;
+    });
+  }, [fetchQuizzes]);
 
   const handleSaveToggle = async (quizId, e) => {
     e.preventDefault();

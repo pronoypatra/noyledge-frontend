@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import api from '../../utils/api';
 import { API_BASE_URL } from '../../utils/api';
@@ -24,44 +24,41 @@ const Profile = () => {
   const [isFollowing, setIsFollowing] = useState(false);
   const [canChat, setCanChat] = useState(false);
 
-  useEffect(() => {
-    fetchProfile();
-  }, [userId]);
-
-  const fetchProfile = async () => {
+  const fetchProfile = useCallback(async () => {
     try {
       const response = await api.get(`/profile/${userId}`);
-      setProfile(response.data.user);
+      const user = response.data.user;
+      setProfile(user);
       setStats(response.data.stats);
       setRecentQuizzes(response.data.recentQuizzes || []);
-      setIsFollowing(response.data.user.isFollowing || false);
-      
-      // Check if mutual follow exists (required for chat)
-      // User must follow them AND they must follow user
+      setIsFollowing(user.isFollowing || false);
+
       const currentUserId = localStorage.getItem('userId');
       if (currentUserId && currentUserId !== userId) {
-        // Check if we follow them and they follow us
-        const weFollowThem = response.data.user.isFollowing;
-        const theyFollowUs = response.data.user.followersCount > 0 && 
-                            response.data.user.followers?.some(
-                              id => id.toString() === currentUserId
-                            );
+        const weFollowThem = user.isFollowing;
+        const theyFollowUs =
+          user.followersCount > 0 &&
+          user.followers?.some(id => id.toString() === currentUserId);
         setCanChat(weFollowThem && theyFollowUs);
       } else {
         setCanChat(false);
       }
-      
+
       setEditData({
-        name: response.data.user.name,
-        bio: response.data.user.bio || '',
-        avatar: response.data.user.avatar || '',
+        name: user.name,
+        bio: user.bio || '',
+        avatar: user.avatar || '',
       });
       setLoading(false);
     } catch (error) {
       console.error('Error fetching profile:', error);
       setLoading(false);
     }
-  };
+  }, [userId]);
+
+  useEffect(() => {
+    fetchProfile();
+  }, [fetchProfile]);
 
   const handleFollowToggle = async () => {
     try {

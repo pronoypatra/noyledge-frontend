@@ -13,12 +13,12 @@ function AdminPanel() {
 
   useEffect(() => {
     fetchQuizzes();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchQuizzes = async () => {
     try {
       const response = await api.get("/quizzes");
-      const userId = localStorage.getItem("userId");
 
       const createdByMe = response.data.filter(
         (q) => q.createdBy._id.toString() === userId

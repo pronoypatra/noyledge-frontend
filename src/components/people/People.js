@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../../utils/api';
 import { API_BASE_URL } from '../../utils/api';
@@ -16,20 +16,7 @@ const People = () => {
   const [sortBy, setSortBy] = useState('followers');
   const [followingStatus, setFollowingStatus] = useState(new Map());
 
-  useEffect(() => {
-    fetchUsers();
-  }, [sortBy]);
-
-  useEffect(() => {
-    // Debounce search
-    const timer = setTimeout(() => {
-      fetchUsers();
-    }, 300);
-
-    return () => clearTimeout(timer);
-  }, [search, sortBy]);
-
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async () => {
     try {
       setLoading(true);
       const params = { sortBy };
@@ -52,7 +39,11 @@ const People = () => {
       console.error('Error fetching users:', error);
       setLoading(false);
     }
-  };
+  }, [search, sortBy]);
+
+  useEffect(() => {
+    fetchUsers();
+  }, [fetchUsers]);
 
   const handleFollowToggle = async (userId, e) => {
     e.preventDefault();
