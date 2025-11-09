@@ -1,0 +1,49 @@
+.chat-container {
+  min-height: 100vh;
+  background-color: #f5f5f5;
+  display: flex;
+  flex-direction: column;
+}
+
+.chat-loading {
+  text-align: center;
+  padding: 3rem;
+  color: #666;
+}
+
+.chat-layout {
+  display: flex;
+  height: calc(100vh - 80px); /* Subtract navbar height */
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.chat-placeholder {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  color: #666;
+  text-align: center;
+  padding: 2rem;
+}
+
+.chat-placeholder h2 {
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+.chat-placeholder p {
+  color: #999;
+}
+
+@media (max-width: 768px) {
+  .chat-layout {
+    flex-direction: column;
+    height: auto;
+  }
+}
+

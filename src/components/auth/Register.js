@@ -10,18 +10,25 @@ const Register = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("user");
-  const { setAuth } = useContext(AuthContext);
+  const { updateAuth } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       const res = await api.post("/auth/register", { name, email, password, role });
-      localStorage.setItem("token", res.data.token);
-      setAuth({ user: res.data, token: res.data.token });
-      navigate("/dashboard");
+      if (res.data && res.data.token) {
+        updateAuth(res.data, res.data.token);
+        navigate("/dashboard");
+      } else {
+        alert("Registration failed: Invalid response from server");
+      }
     } catch (err) {
-      alert(err.response?.data?.message || "Registration failed");
+      console.error("Registration error:", err);
+      const errorMessage = err.response?.data?.message || 
+                          err.message || 
+                          (err.code === 'ECONNREFUSED' ? "Cannot connect to server. Please ensure the backend server is running." : "Registration failed");
+      alert(`Registration failed: ${errorMessage}`);
     }
   };
 

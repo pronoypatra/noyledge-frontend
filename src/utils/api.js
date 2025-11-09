@@ -1,12 +1,14 @@
 import axios from "axios";
 
+// Get base URL from environment variable or use default
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "http://localhost:5000";
+
 const api = axios.create({
-  baseURL: `${process.env.REACT_APP_API_BASE_URL}/api`, // dynamic based on env
+  baseURL: `${API_BASE_URL}/api`,
+  timeout: 10000, // 10 second timeout
 });
 
-// const api = axios.create({
-//   baseURL: "http://localhost:5000/api", // change if backend is hosted
-// });
+console.log("API Base URL:", `${API_BASE_URL}/api`);
 
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
@@ -20,5 +22,22 @@ api.interceptors.request.use((config) => {
 
   return config;
 });
+
+// Response interceptor to handle 401 errors (token expired/invalid)
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      // Token expired or invalid, clear storage and redirect to login
+      localStorage.removeItem("token");
+      localStorage.removeItem("userId");
+      // Redirect to login page
+      if (window.location.pathname !== "/login" && window.location.pathname !== "/register") {
+        window.location.href = "/login";
+      }
+    }
+    return Promise.reject(error);
+  }
+);
 
 export default api;

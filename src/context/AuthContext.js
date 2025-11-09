@@ -7,32 +7,85 @@ export const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const [auth, setAuth] = useState({
     user: null,
-    token: localStorage.getItem("token"), // Get the token from localStorage
+    token: localStorage.getItem("token"),
   });
+  const [loading, setLoading] = useState(true);
 
+  // Restore user session from localStorage on app startup
   useEffect(() => {
-    if (auth.token && !auth.user) {
-      // If token is available and user is not set, decode the token and set user
+    const restoreSession = () => {
+      const token = localStorage.getItem("token");
+      
+      if (!token) {
+        setLoading(false);
+        return;
+      }
+
       try {
-        const payload = JSON.parse(atob(auth.token.split(".")[1]));
-        setAuth((prev) => ({
-          ...prev,
-          user: { _id: payload.userId, role: payload.role },
-        }));
+        // Decode token to get user info
+        const payload = JSON.parse(atob(token.split(".")[1]));
+        
+        // Check if token is expired
+        const currentTime = Date.now() / 1000;
+        if (payload.exp && payload.exp < currentTime) {
+          // Token expired, clear it
+          localStorage.removeItem("token");
+          localStorage.removeItem("userId");
+          setAuth({ user: null, token: null });
+          setLoading(false);
+          return;
+        }
+
+        const user = { 
+          _id: payload.userId, 
+          role: payload.role 
+        };
+        
+        // Restore user session from token
+        setAuth({
+          user,
+          token,
+        });
+
+        // Store userId in localStorage for easy access
+        if (payload.userId) {
+          localStorage.setItem("userId", payload.userId);
+        }
       } catch (err) {
         console.error("Invalid token", err);
+        // Token is invalid, clear it
+        localStorage.removeItem("token");
+        localStorage.removeItem("userId");
+        setAuth({ user: null, token: null });
+      } finally {
+        setLoading(false);
       }
-    }
-  }, [auth.token, auth.user]); // Only run the effect if token or user state changes
+    };
 
-  // You can add a function to log out the user and remove the token
+    restoreSession();
+  }, []); // Run only once on mount
+
+  // Update auth state helper
+  const updateAuth = (userData, token) => {
+    localStorage.setItem("token", token);
+    if (userData._id) {
+      localStorage.setItem("userId", userData._id);
+    }
+    setAuth({
+      user: userData,
+      token,
+    });
+  };
+
+  // Logout function
   const logout = () => {
     localStorage.removeItem("token");
+    localStorage.removeItem("userId");
     setAuth({ user: null, token: null });
   };
 
   return (
-    <AuthContext.Provider value={{ auth, setAuth, logout }}>
+    <AuthContext.Provider value={{ auth, setAuth, logout, updateAuth, loading }}>
       {children}
     </AuthContext.Provider>
   );

@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import api from '../../utils/api';
+import Navbar from '../common/Navbar';
 import './AddQuestions.css';
 import "../../App.css";
 
 const AddQuestions = () => {
   const { id: quizId } = useParams();
+  const navigate = useNavigate();
   const [questionText, setQuestionText] = useState('');
   const [options, setOptions] = useState(['', '', '', '']);
   const [correctOption, setCorrectOption] = useState(0);
@@ -51,37 +53,49 @@ const AddQuestions = () => {
   };
 
   return (
-    <div className="add-question">
-      <h2 className="title">Add Question to Quiz</h2>
-      {message && <div className="status-message">{message}</div>}
-      <form onSubmit={handleSubmit} className="question-form">
-        <textarea
-          placeholder="Enter your question"
-          value={questionText}
-          onChange={(e) => setQuestionText(e.target.value)}
-          className="question-text"
-          required
-        />
-        {options.map((option, index) => (
-          <div key={index} className="option-row">
-            <input
-              type="radio"
-              name="correctOption"
-              checked={correctOption === index}
-              onChange={() => setCorrectOption(index)}
-            />
-            <input
-              type="text"
-              placeholder={`Option ${index + 1}`}
-              value={option}
-              onChange={(e) => handleOptionChange(e.target.value, index)}
-              className="option-input"
-              required
-            />
+    <div className="add-question-container">
+      <Navbar />
+      <div className="add-question">
+        <h2 className="title">Add Question to Quiz</h2>
+        {message && <div className="status-message">{message}</div>}
+        <form onSubmit={handleSubmit} className="question-form">
+          <textarea
+            placeholder="Enter your question"
+            value={questionText}
+            onChange={(e) => setQuestionText(e.target.value)}
+            className="question-text"
+            required
+          />
+          {options.map((option, index) => (
+            <div key={index} className="option-row">
+              <input
+                type="radio"
+                name="correctOption"
+                checked={correctOption === index}
+                onChange={() => setCorrectOption(index)}
+              />
+              <input
+                type="text"
+                placeholder={`Option ${index + 1}`}
+                value={option}
+                onChange={(e) => handleOptionChange(e.target.value, index)}
+                className="option-input"
+                required
+              />
+            </div>
+          ))}
+          <div className="form-buttons">
+            <button type="submit" className="submit-btn">Add Question</button>
+            <button 
+              type="button"
+              onClick={() => navigate('/dashboard')} 
+              className="back-to-dashboard-btn"
+            >
+              Back to Dashboard
+            </button>
           </div>
-        ))}
-        <button type="submit" className="submit-btn">Add Question</button>
-      </form>
+        </form>
+      </div>
     </div>
   );
 };
