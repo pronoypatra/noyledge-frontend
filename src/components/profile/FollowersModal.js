@@ -89,7 +89,7 @@ const FollowersModal = ({ userId, isOpen, onClose, onUpdate }) => {
 
     try {
       await api.delete(`/profile/${userId}/followers/${followerId}`);
-      setFollowers(followers.filter(f => f._id !== followerId));
+      setFollowers(followers.filter(f => f._id.toString() !== followerId));
       if (onUpdate) {
         onUpdate();
       }
@@ -118,14 +118,15 @@ const FollowersModal = ({ userId, isOpen, onClose, onUpdate }) => {
           ) : (
             <div className="followers-list">
               {followers.map((follower) => {
-                const isFollowing = followingStatus.get(follower._id) || false;
-                const isCurrentUser = follower._id === currentUserId;
+                const followerId = follower._id.toString();
+                const isFollowing = followingStatus.get(followerId) || false;
+                const isCurrentUser = followerId === currentUserId;
                 
                 return (
                   <div key={follower._id} className="follower-item">
                     <div 
                       className="follower-info"
-                      onClick={() => handleUserClick(follower._id)}
+                      onClick={() => handleUserClick(followerId)}
                       style={{ cursor: 'pointer' }}
                     >
                       {follower.avatar ? (
@@ -148,7 +149,7 @@ const FollowersModal = ({ userId, isOpen, onClose, onUpdate }) => {
                       {canRemove && !isCurrentUser && (
                         <button
                           className="remove-btn"
-                          onClick={() => handleRemoveFollower(follower._id)}
+                          onClick={() => handleRemoveFollower(followerId)}
                           title="Remove follower"
                         >
                           <PersonRemoveIcon />

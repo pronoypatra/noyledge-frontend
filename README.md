@@ -19,6 +19,10 @@ A modern, feature-rich React frontend for the Quiz Application with real-time fe
 ### Authentication & User Management
 - **User Registration & Login**: Email/password authentication with validation
 - **Google OAuth Integration**: One-click sign-in with Google account
+- **CAS Authentication**: Central Authentication Service (SSO) login support
+  - CAS callback handling
+  - Automatic user creation/update
+  - Token-based authentication flow
 - **Persistent Login**: Automatic session restoration from localStorage
   - Token expiration checking
   - Automatic logout on token expiry
@@ -43,7 +47,16 @@ A modern, feature-rich React frontend for the Quiz Application with real-time fe
   - Save quizzes for later viewing
   - Save individual questions for review
   - Quick access to saved content
+  - Toggle save/unsave from quiz cards
 - **Category Following**: Subscribe to quiz categories to stay updated
+- **Quiz Timer**: Real-time timer display during quiz attempts
+  - Shows elapsed time in MM:SS or HH:MM:SS format
+  - Tracks completion time for analytics
+  - Displayed in quiz results
+- **Question Reporting**: Report inappropriate questions during quiz
+  - Report button on each question
+  - Reason text input
+  - One report per question per user
 
 ### Admin Features
 - **Quiz Management**: Create, edit, and delete quizzes
@@ -54,11 +67,15 @@ A modern, feature-rich React frontend for the Quiz Application with real-time fe
   - Participant growth charts
   - Attempts over time
   - Average score trends
-  - Reported vs fixed questions visualization
+  - **Completion Time Distribution**: Histogram showing how many users took how much time
+  - Completion time statistics (average, median, min, max)
 - **Reports Management**: Moderate reported questions
-  - View all reports
+  - View reports only for quizzes you created
+  - Filter by status (All, Pending, Fixed, Ignored, Deleted)
   - Fix, ignore, or delete questions
+  - Edit question text and options when fixing
   - Auto-expiry indicators
+  - Quiz title display for each report
 
 ### User Profile
 - **Profile Information**: View and edit user details
@@ -69,19 +86,36 @@ A modern, feature-rich React frontend for the Quiz Application with real-time fe
   - Average score across all quizzes
   - Quiz streak (consecutive days)
   - Total badges earned
+- **Follow/Following System**:
+  - Followers and following counts (clickable)
+  - Follow/Unfollow button for other users
+  - Followers modal with remove functionality
+  - Following modal with unfollow functionality
+  - Mutual follow indicators
 - **Badge Display**: Visual representation of earned achievements
 - **Quiz History**: Complete list of quiz attempts with scores and dates
 - **Followed Categories**: Manage subscription to quiz categories
 - **Profile Editing**: Update profile information with real-time validation
+- **Chat Button**: Start chat with users you mutually follow
 
 ### Real-time Features
-- **Chat System**: Real-time messaging between quiz creators and participants
-  - Socket.io client integration
-  - Message history
-  - Online status indicators (backend ready)
+- **Chat System**: REST-based messaging with polling
+  - Chat with users you mutually follow
+  - Chat list showing all conversations
+  - Message history with sender information
+  - Real-time updates via polling (every 2 seconds)
+  - Optimistic UI updates for instant feedback
+  - Start new chats from profile or People page
+  - Mutual follow requirement enforced
 - **Real-time Notifications**: Badge awards, quiz updates (backend ready)
 
 ### Bonus Features
+- **People/Discover Page**: 
+  - Discover and search users
+  - Sort by followers, name, or recent
+  - Follow/unfollow users
+  - View mutual followers
+  - User cards with avatars and stats
 - **Infinite Scroll**: Efficient loading of quiz lists and leaderboards
 - **Keyboard Shortcuts**: 
   - Quiz navigation (N=Next, P=Previous)
@@ -95,6 +129,8 @@ A modern, feature-rich React frontend for the Quiz Application with real-time fe
 - **Responsive Design**: Mobile-friendly interface
 - **Time Tracking**: Real-time quiz completion time display
 - **Progress Indicators**: Visual progress bars and completion status
+- **Navbar with Icons**: Material-UI icons for all navigation items
+- **Quiz Creator Info**: Display creator on quiz cards with follow button
 
 ## Tech Stack
 
@@ -135,9 +171,20 @@ frontend/
 │   │   ├── explore/
 │   │   │   └── Explore.js           # Explore quizzes page
 │   │   ├── profile/
-│   │   │   └── Profile.js           # User profile page
+│   │   │   ├── Profile.js           # User profile page
+│   │   │   ├── FollowersModal.js    # Followers list modal
+│   │   │   └── FollowingModal.js   # Following list modal
+│   │   ├── people/
+│   │   │   └── People.js            # Discover users page
+│   │   ├── chat/
+│   │   │   ├── Chat.js              # Main chat container
+│   │   │   ├── ChatList.js          # Chat list sidebar
+│   │   │   └── ChatWindow.js        # Chat conversation window
 │   │   ├── saved/
 │   │   │   └── SavedQuizzes.js     # Saved quizzes page
+│   │   ├── common/
+│   │   │   ├── Navbar.js            # Navigation bar with icons
+│   │   │   └── ProtectedRoute.js    # Route protection
 │   │   └── Home.js                  # Landing page
 │   ├── context/
 │   │   └── AuthContext.js          # Authentication context
@@ -185,22 +232,26 @@ The app will open at [http://localhost:3000](http://localhost:3000)
 
 ### Public Routes
 - `/` - Home/Landing page
-- `/login` - User login
+- `/login` - User login (with Google OAuth and CAS options)
 - `/register` - User registration
-- `/explore` - Explore quizzes (search, filter, sort)
+- `/auth/cas/success` - CAS authentication callback handler
 
 ### Protected Routes (Require Authentication)
 - `/dashboard` - User/Admin dashboard (role-based)
 - `/quiz/:id` - Attempt a quiz
 - `/profile/:userId` - View user profile
+- `/explore` - Explore quizzes (search, filter, sort)
+- `/people` - Discover and search users
+- `/chat` - Chat page (list of conversations)
+- `/chat/:chatId` - Individual chat conversation
 - `/saved/quizzes` - View saved quizzes
 
 ### Admin-Only Routes
 - `/admin/quiz/create` - Create new quiz
-- `/admin/quiz/:id/questions` - Add questions to quiz
+- `/admin/quiz/:id/questions` - Add questions to quiz (with Back to Dashboard button)
 - `/admin/quiz/:id/results` - View quiz results
 - `/admin/quiz/:quizId/analytics` - View quiz analytics
-- `/admin/reports` - Manage reported questions
+- `/admin/reports` - Manage reported questions (only own quizzes)
 
 ## Components
 
@@ -232,15 +283,18 @@ The app will open at [http://localhost:3000](http://localhost:3000)
 - **Enhanced quiz interface** with:
   - One question at a time display
   - Progress bar
+  - **Real-time timer** (MM:SS or HH:MM:SS format)
   - Previous/Next navigation
   - **Keyboard shortcuts**:
     - `N` - Next question
     - `P` - Previous question
     - `S` - Submit quiz
     - `1-4` - Select option
+  - **Report Question** button on each question
+  - Report modal with reason input
   - Confirmation before leaving page
-  - Time tracking
-  - Results display with badges earned
+  - Time tracking and display
+  - Results display with badges earned and completion time
 
 ### Admin Components
 
@@ -256,20 +310,23 @@ The app will open at [http://localhost:3000](http://localhost:3000)
 - Add multiple choice questions
 - Set correct answer
 - Banned keywords automatically filtered
+- **Back to Dashboard** button (same size as Add Question button)
 
 #### Analytics (`/components/admin/Analytics.js`)
 - **Comprehensive analytics dashboard**:
   - Participant growth line chart
   - Attempts over time bar chart
   - Average score trends line chart
-  - Reported vs fixed questions pie chart
+  - **Completion Time Distribution**: Bar chart histogram
+  - Completion time statistics (average, median, min, max)
 - Uses Recharts library
 
 #### Reports (`/components/admin/Reports.js`)
-- List of all reported questions
-- Filter by status (All, Pending, Fixed, Ignored)
+- List of reported questions (only for quizzes you created)
+- Filter by status (All, Pending, Fixed, Ignored, Deleted)
 - Actions: Fix (edit), Ignore, Delete
-- Shows report reason, reporter, and expiry date
+- Shows quiz title, report reason, reporter, and expiry date
+- Edit question form when fixing reports
 
 ### Explore Component
 
@@ -285,7 +342,9 @@ The app will open at [http://localhost:3000](http://localhost:3000)
   - Title and description
   - Tags and difficulty
   - Statistics (participants, questions, average score)
+  - **Creator information** with avatar and follow button
   - Start Quiz button
+  - Save/Unsave button
 
 ### Profile Component
 
@@ -294,12 +353,19 @@ The app will open at [http://localhost:3000](http://localhost:3000)
   - Avatar and bio
   - Email
   - Statistics (quizzes attempted, average score, badges)
+- **Follow/Following System**:
+  - Followers and following counts (clickable)
+  - Follow/Unfollow button
+  - Chat button (if mutual follow exists)
 - **Edit profile** functionality:
   - Update name and bio
   - Upload avatar image
 - Badges earned display
 - Recent quiz attempts
 - Followed categories
+- **Modals**:
+  - FollowersModal: View followers with remove and follow options
+  - FollowingModal: View following with unfollow option
 
 ### Saved Component
 
@@ -309,6 +375,54 @@ The app will open at [http://localhost:3000](http://localhost:3000)
 - Unsave functionality (toggle save/unsave)
 - Quick access to start quiz
 - Empty state handling
+
+### People Component
+
+#### People (`/components/people/People.js`)
+- **User Discovery Page**:
+  - Search users by name or email
+  - Sort by followers, name, or recent join date
+  - User cards with:
+    - Avatar and name
+    - Email and bio
+    - Follower count, badge count
+    - Mutual followers indicator
+    - Follow/Unfollow button
+  - Click user card to view profile
+  - Responsive grid layout
+
+### Chat Components
+
+#### Chat (`/components/chat/Chat.js`)
+- Main chat container with sidebar and conversation view
+- Handles URL parameters for starting chats from profiles
+- Manages chat list and selected chat state
+
+#### ChatList (`/components/chat/ChatList.js`)
+- **Chat Sidebar**:
+  - List of all chats (mutual follow required)
+  - Last message preview
+  - Timestamp display
+  - Click to open conversation
+  - Refresh button
+- **Start New Chat Section**:
+  - Shows mutual follows without existing chats
+  - Quick start chat buttons
+  - Filters out users with existing chats
+
+#### ChatWindow (`/components/chat/ChatWindow.js`)
+- **Chat Conversation View**:
+  - Message display (oldest at top, newest at bottom)
+  - Message bubbles (different styles for own/other)
+  - Sender avatars and names
+  - Timestamp formatting
+  - Auto-scroll to bottom
+  - **Message Input**:
+    - Text input with send button
+    - Optimistic UI updates
+    - Real-time polling (every 2 seconds)
+  - Header with other user info and "View Profile" button
+  - Mutual follow status indicator
 
 #### Saved Questions (Backend Ready)
 - Save individual questions for later review
@@ -386,6 +500,9 @@ REACT_APP_API_BASE_URL=http://localhost:5000
 
 # Google OAuth Client ID (for Google Sign-In)
 REACT_APP_GOOGLE_CLIENT_ID=your_google_client_id_here
+
+# CAS Authentication (optional)
+REACT_APP_CAS_ENABLED=true
 ```
 
 ### Environment Variables Explained
@@ -395,6 +512,9 @@ REACT_APP_GOOGLE_CLIENT_ID=your_google_client_id_here
   - Required for Google OAuth login feature
   - Get from [Google Cloud Console](https://console.cloud.google.com/)
   - See [Google OAuth Setup Guide](#google-oauth-setup-guide) for detailed instructions
+- **REACT_APP_CAS_ENABLED**: Enable CAS authentication button (optional, default: false)
+  - Set to "true" to show CAS login button
+  - Requires backend CAS configuration
 
 ## API Integration
 
