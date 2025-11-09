@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../../utils/api';
+import { API_BASE_URL } from '../../utils/api';
 import './ChatWindow.css';
 
 const ChatWindow = ({ chat, onNewMessage, onRefreshChats }) => {
@@ -150,7 +151,7 @@ const ChatWindow = ({ chat, onNewMessage, onRefreshChats }) => {
           <div className="chat-header-info">
             {otherUser.avatar ? (
               <img
-                src={`http://localhost:5000${otherUser.avatar}`}
+                src={`${API_BASE_URL}${otherUser.avatar}`}
                 alt={otherUser.name}
                 className="chat-header-avatar"
               />
@@ -192,7 +193,7 @@ const ChatWindow = ({ chat, onNewMessage, onRefreshChats }) => {
                   <div className="message-sender">
                     {message.sender.avatar ? (
                       <img
-                        src={`http://localhost:5000${message.sender.avatar}`}
+                        src={`${API_BASE_URL}${message.sender.avatar}`}
                         alt={message.sender.name}
                         className="message-avatar"
                       />

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import api from '../../utils/api';
+import { API_BASE_URL } from '../../utils/api';
 import Navbar from '../common/Navbar';
 import FollowersModal from './FollowersModal';
 import FollowingModal from './FollowingModal';
@@ -122,9 +123,9 @@ const Profile = () => {
       <div className="profile-content">
         <div className="profile-header">
         <div className="profile-avatar">
-          {profile.avatar ? (
-            <img src={`http://localhost:5000${profile.avatar}`} alt={profile.name} />
-          ) : (
+            {profile.avatar ? (
+              <img src={`${API_BASE_URL}${profile.avatar}`} alt={profile.name} />
+            ) : (
             <div className="avatar-placeholder">{profile.name.charAt(0).toUpperCase()}</div>
           )}
         </div>

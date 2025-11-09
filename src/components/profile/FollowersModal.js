@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../../utils/api';
+import { API_BASE_URL } from '../../utils/api';
 import './FollowersModal.css';
 import CloseIcon from '@mui/icons-material/Close';
 import PersonRemoveIcon from '@mui/icons-material/PersonRemove';
@@ -55,6 +56,12 @@ const FollowersModal = ({ userId, isOpen, onClose, onUpdate }) => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (isOpen && userId) {
+      fetchFollowers();
+    }
+  }, [isOpen, userId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleFollowToggle = async (targetUserId, e) => {
     e.preventDefault();
@@ -131,7 +138,7 @@ const FollowersModal = ({ userId, isOpen, onClose, onUpdate }) => {
                     >
                       {follower.avatar ? (
                         <img
-                          src={`http://localhost:5000${follower.avatar}`}
+                          src={`${API_BASE_URL}${follower.avatar}`}
                           alt={follower.name}
                           className="follower-avatar"
                         />

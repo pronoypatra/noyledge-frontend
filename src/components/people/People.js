@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../../utils/api';
+import { API_BASE_URL } from '../../utils/api';
 import Navbar from '../common/Navbar';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import PersonRemoveIcon from '@mui/icons-material/PersonRemove';
@@ -139,7 +140,7 @@ const People = () => {
                   >
                     {user.avatar ? (
                       <img
-                        src={`http://localhost:5000${user.avatar}`}
+                        src={`${API_BASE_URL}${user.avatar}`}
                         alt={user.name}
                         className="user-avatar"
                       />

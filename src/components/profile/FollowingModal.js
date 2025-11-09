@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../../utils/api';
+import { API_BASE_URL } from '../../utils/api';
 import './FollowingModal.css';
 import CloseIcon from '@mui/icons-material/Close';
 import PersonRemoveIcon from '@mui/icons-material/PersonRemove';
@@ -84,13 +85,13 @@ const FollowingModal = ({ userId, isOpen, onClose, onUpdate }) => {
                     onClick={() => handleUserClick(user._id)}
                     style={{ cursor: 'pointer' }}
                   >
-                    {user.avatar ? (
-                      <img
-                        src={`http://localhost:5000${user.avatar}`}
-                        alt={user.name}
-                        className="following-avatar"
-                      />
-                    ) : (
+                        {user.avatar ? (
+                          <img
+                            src={`${API_BASE_URL}${user.avatar}`}
+                            alt={user.name}
+                            className="following-avatar"
+                          />
+                        ) : (
                       <div className="following-avatar-placeholder">
                         {user.name.charAt(0).toUpperCase()}
                       </div>

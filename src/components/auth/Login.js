@@ -1,5 +1,6 @@
 import React, { useState, useContext, useEffect, useCallback } from "react";
 import api from "../../utils/api";
+import { API_BASE_URL } from "../../utils/api";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
 import "./Login.css";
@@ -23,8 +24,7 @@ const Login = () => {
 
   // Handle CAS login redirect
   const handleCasLogin = () => {
-    const apiBaseUrl = process.env.REACT_APP_API_BASE_URL || "http://localhost:5000";
-    window.location.href = `${apiBaseUrl}/api/auth/cas/login`;
+    window.location.href = `${API_BASE_URL}/api/auth/cas/login`;
   };
 
   const handleSubmit = async (e) => {

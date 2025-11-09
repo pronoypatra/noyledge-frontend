@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../../utils/api';
+import { API_BASE_URL } from '../../utils/api';
 import './ChatList.css';
 
 const ChatList = ({ chats, selectedChatId, onChatSelect, onRefresh }) => {
@@ -117,7 +118,7 @@ const ChatList = ({ chats, selectedChatId, onChatSelect, onRefresh }) => {
                   <>
                     {otherUser.avatar ? (
                       <img
-                        src={`http://localhost:5000${otherUser.avatar}`}
+                        src={`${API_BASE_URL}${otherUser.avatar}`}
                         alt={otherUser.name}
                         className="chat-avatar"
                       />
@@ -171,7 +172,7 @@ const ChatList = ({ chats, selectedChatId, onChatSelect, onRefresh }) => {
                 >
                   {user.avatar ? (
                     <img
-                      src={`http://localhost:5000${user.avatar}`}
+                      src={`${API_BASE_URL}${user.avatar}`}
                       alt={user.name}
                       className="mutual-avatar"
                     />

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../../utils/api';
+import { API_BASE_URL } from '../../utils/api';
 import Navbar from '../common/Navbar';
 import './SavedQuizzes.css';
 
@@ -47,13 +48,13 @@ const SavedQuizzes = () => {
           <div className="quizzes-grid">
             {quizzes.map((quiz) => (
               <div key={quiz._id} className="quiz-card">
-                {quiz.imageUrl && (
-                  <img
-                    src={`http://localhost:5000${quiz.imageUrl}`}
-                    alt={quiz.title}
-                    className="quiz-image"
-                  />
-                )}
+                  {quiz.imageUrl && (
+                    <img
+                      src={`${API_BASE_URL}${quiz.imageUrl}`}
+                      alt={quiz.title}
+                      className="quiz-image"
+                    />
+                  )}
                 <div className="quiz-card-content">
                   <h3>{quiz.title}</h3>
                   <p className="quiz-description">{quiz.description}</p>
