@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { Link } from 'react-router-dom';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import api from '../../utils/api';
 import { API_BASE_URL } from '../../utils/api';
@@ -14,7 +14,7 @@ const Explore = () => {
   const [difficulty, setDifficulty] = useState('');
   const [sortBy, setSortBy] = useState('date');
   const [categories, setCategories] = useState([]);
-  const [page, setPage] = useState(1);
+  const pageRef = useRef(1);
   const [hasMore, setHasMore] = useState(true);
   const [savedQuizIds, setSavedQuizIds] = useState(new Set());
   const [followingUserIds, setFollowingUserIds] = useState(new Set());
@@ -90,12 +90,13 @@ const Explore = () => {
   }, [fetchCategories, fetchSavedQuizzes, fetchFollowingStatus]);
 
   useEffect(() => {
+    pageRef.current = 1;
     fetchQuizzes();
   }, [fetchQuizzes]);
 
   const handleSearch = (e) => {
     setSearch(e.target.value);
-    setPage(1);
+    pageRef.current = 1;
   };
 
   const handleTagToggle = (tagName) => {
@@ -104,15 +105,12 @@ const Explore = () => {
     } else {
       setSelectedTags([...selectedTags, tagName]);
     }
-    setPage(1);
+    pageRef.current = 1;
   };
 
   const handleLoadMore = useCallback(() => {
-    setPage(prevPage => {
-      const nextPage = prevPage + 1;
-      fetchQuizzes(nextPage, true);
-      return nextPage;
-    });
+    pageRef.current += 1;
+    fetchQuizzes(pageRef.current, true);
   }, [fetchQuizzes]);
 
   const handleSaveToggle = async (quizId, e) => {

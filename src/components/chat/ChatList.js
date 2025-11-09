@@ -7,7 +7,6 @@ import './ChatList.css';
 const ChatList = ({ chats, selectedChatId, onChatSelect, onRefresh }) => {
   const navigate = useNavigate();
   const [mutualFollows, setMutualFollows] = useState([]);
-  const [loading, setLoading] = useState(true);
 
   const fetchMutualFollows = useCallback(async () => {
     try {
@@ -27,10 +26,8 @@ const ChatList = ({ chats, selectedChatId, onChatSelect, onRefresh }) => {
       const mutual = followers.filter(f => followingIds.has(f._id.toString()));
 
       setMutualFollows(mutual);
-      setLoading(false);
     } catch (error) {
       console.error('Error fetching mutual follows:', error);
-      setLoading(false);
     }
   }, []);
 
