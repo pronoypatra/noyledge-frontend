@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Login from "./components/auth/Login";
 import Register from "./components/auth/Register";
 import CasCallback from "./components/auth/CasCallback";
+import RoleSelection from "./components/auth/RoleSelection";
 import AdminPanel from "./components/dashboard/AdminPanel";
 import UserPanel from "./components/dashboard/UserPanel";
 import ProtectedRoute from "./components/common/ProtectedRoute";
@@ -30,6 +31,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/auth/cas/success" element={<CasCallback />} />
+          <Route path="/auth/role-selection" element={<RoleSelection />} />
           <Route path="/quiz/:id" element={<ProtectedRoute><QuizAttempt /></ProtectedRoute>} />
           <Route path="/dashboard" element={<ProtectedRoute><RoleBasedDashboard /></ProtectedRoute>} />
           <Route path="/profile/:userId" element={<ProtectedRoute><Profile /></ProtectedRoute>} />

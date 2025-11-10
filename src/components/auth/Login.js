@@ -59,9 +59,22 @@ const Login = () => {
       };
 
       const res = await api.post("/auth/google", googleData);
-      if (res.data.token) {
+      
+      // Check if role selection is required
+      if (res.data.requiresRoleSelection) {
+        // Store user data for role selection
+        localStorage.setItem("oauthUserData", JSON.stringify({
+          ...googleData,
+          provider: "google",
+        }));
+        // Navigate to role selection
+        navigate("/auth/role-selection");
+      } else if (res.data.token) {
+        // Existing user or role already selected - proceed with login
         updateAuth(res.data, res.data.token);
         navigate("/dashboard");
+      } else {
+        alert("Google sign-in failed. Please try again.");
       }
     } catch (error) {
       console.error("Google sign-in error:", error);
